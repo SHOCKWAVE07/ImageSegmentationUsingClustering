@@ -33,10 +33,7 @@ source venv/bin/activate
 pip install -r requirements.txt
 ```
 
-### 5. Download Dataset
-Download the dataset from [https://www.kaggle.com/datasets/faizalkarim/flood-area-segmentation]
-
-### 6. Run Analysis Scripts
+### 5. Run Analysis Scripts
 ```bash
 # Find optimal K value for K-means clustering
 python optimal_k.py

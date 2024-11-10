@@ -1,6 +1,7 @@
 import os
 import cv2
 import numpy as np
+import time
 from sklearn.decomposition import PCA, FastICA
 from sklearn.cluster import KMeans, MeanShift, estimate_bandwidth
 import plotly.graph_objects as go
@@ -45,7 +46,6 @@ def segment_image_with_kmeans(image, k=3, reduction=None, n_components=2, thresh
         centers = pixel_values_inverse(centers)
 
     segmented_image = np.uint8(centers[labels.flatten()]).reshape(image_rgb.shape)
-
     black_and_white_segmented_image = make_black_and_white(segmented_image, threshold)
     return black_and_white_segmented_image
 
@@ -74,7 +74,6 @@ def segment_image_with_meanshift(image, reduction=None, n_components=2, threshol
         centers = pixel_values_inverse(centers)
 
     segmented_image = np.uint8(centers[labels.flatten()]).reshape(image_rgb.shape)
-
     black_and_white_segmented_image = make_black_and_white(segmented_image, threshold)
     return black_and_white_segmented_image
 
@@ -166,7 +165,7 @@ def main():
         "MeanShift + ICA": lambda img: segment_image_with_meanshift(img, reduction='ICA'),
     }
     
-    results = {method: {'accuracy': []} for method in methods}
+    results = {method: {'accuracy': [], 'time_taken': []} for method in methods}
 
     image_dir = 'Data/Image'
     mask_dir = 'Data/Mask'
@@ -176,9 +175,12 @@ def main():
 
     for method, segment_fn in methods.items():
         for img, mask in zip(images, masks):
+            start_time = time.time()
             segmented_image = segment_fn(img)
+            end_time = time.time()
             if segmented_image is not None:
                 compare_with_mask(segmented_image, mask, results[method]['accuracy'])
+                results[method]['time_taken'].append(end_time - start_time)
         
         print(f"Finished processing {method}")
 
