@@ -29,19 +29,10 @@ def segment_image(image, k):
     segmented_image = segmented_image.reshape(image_rgb.shape)
     return segmented_image
 
-def calculate_iou(pred, target):
-    intersection = np.logical_and(pred, target)
-    union = np.logical_or(pred, target)
-    return np.sum(intersection) / np.sum(union)
-
-def calculate_dice(pred, target):
-    intersection = np.logical_and(pred, target)
-    return 2. * np.sum(intersection) / (np.sum(pred) + np.sum(target))
-
 def calculate_pixel_accuracy(pred, target):
     return np.mean(pred == target)
 
-def compare_with_mask(segmented_image, mask, iou_scores, dice_scores, accuracies):
+def compare_with_mask(segmented_image, mask, accuracies):
     ground_truth_mask = cv2.cvtColor(mask, cv2.COLOR_BGR2GRAY)
     segmented_image_resized = cv2.resize(segmented_image, (ground_truth_mask.shape[1], ground_truth_mask.shape[0]), interpolation=cv2.INTER_NEAREST)
     segmented_gray = cv2.cvtColor(segmented_image_resized, cv2.COLOR_BGR2GRAY)
@@ -49,41 +40,42 @@ def compare_with_mask(segmented_image, mask, iou_scores, dice_scores, accuracies
     _, ground_truth_binary = cv2.threshold(ground_truth_mask, 127, 1, cv2.THRESH_BINARY)
     _, segmented_binary = cv2.threshold(segmented_gray, 127, 1, cv2.THRESH_BINARY)
 
-    iou = calculate_iou(segmented_binary, ground_truth_binary)
-    dice = calculate_dice(segmented_binary, ground_truth_binary)
     accuracy = calculate_pixel_accuracy(segmented_binary, ground_truth_binary)
-    
-    iou_scores.append(iou)
-    dice_scores.append(dice)
+   
     accuracies.append(accuracy)
 
 def plot_results(results):
-    fig = make_subplots(rows=1, cols=3, subplot_titles=('Accuracy', 'IoU Score', 'Dice Score'))
+    # Create a single plot for accuracy scores of all methods
+    fig = go.Figure()
 
-    # Plot accuracy
-    fig.add_trace(go.Scatter(x=list(results.keys()), 
-                             y=[np.mean(v['accuracy']) for v in results.values()], 
-                             mode='lines+markers', 
-                             name='Accuracy'), row=1, col=1)
-    
-    # Plot IoU
-    fig.add_trace(go.Scatter(x=list(results.keys()), 
-                             y=[np.mean(v['iou']) for v in results.values()], 
-                             mode='lines+markers', 
-                             name='IoU'), row=1, col=2)
-    
-    # Plot Dice Score
-    fig.add_trace(go.Scatter(x=list(results.keys()), 
-                             y=[np.mean(v['dice']) for v in results.values()], 
-                             mode='lines+markers', 
-                             name='Dice'), row=1, col=3)
+    # Add accuracy scores as a line plot with markers
+    fig.add_trace(go.Scatter(
+        x=list(results.keys()), 
+        y=[np.mean(v['accuracy']) for v in results.values()], 
+        mode='lines+markers', 
+        name='Accuracy',
+        marker=dict(size=8, color='blue')
+    ))
 
-    fig.update_layout(height=400, width=1200, title_text="Segmentation Metrics for Different K Values")
-    fig.show()
+    # Update layout
+    fig.update_layout(
+        title="Segmentation Accuracy for Different Methods",
+        xaxis_title="Methods",
+        yaxis_title="Accuracy Score",
+        height=400,
+        width=1000
+    )
+    
+    # Save the plot as an image
+    if not os.path.exists('Image'):
+        os.makedirs('Image')
+    fig.write_image("Image/accuracy_plot.png")
+    
+    print("Plot saved as Image/accuracy_plot.png")
 
 def main():
     k_values = range(2, 11)
-    results = {k: {'accuracy': [], 'iou': [], 'dice': []} for k in k_values}
+    results = {k: {'accuracy': []} for k in k_values}
 
     image_dir = 'Data/Image'
     mask_dir = 'Data/Mask'
@@ -92,10 +84,9 @@ def main():
     masks = load_images(mask_dir)
     for k in k_values:
         for img, mask in zip(images, masks):
-            print(img,mask)
             segmented_image = segment_image(img, k)
             if segmented_image is not None:
-                compare_with_mask(segmented_image, mask, results[k]['iou'], results[k]['dice'], results[k]['accuracy'])
+                compare_with_mask(segmented_image, mask, results[k]['accuracy'])
         
     plot_results(results)
 
