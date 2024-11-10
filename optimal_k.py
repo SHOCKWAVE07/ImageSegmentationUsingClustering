@@ -45,10 +45,8 @@ def compare_with_mask(segmented_image, mask, accuracies):
     accuracies.append(accuracy)
 
 def plot_results(results):
-    # Create a single plot for accuracy scores of all methods
     fig = go.Figure()
 
-    # Add accuracy scores as a line plot with markers
     fig.add_trace(go.Scatter(
         x=list(results.keys()), 
         y=[np.mean(v['accuracy']) for v in results.values()], 
@@ -57,7 +55,6 @@ def plot_results(results):
         marker=dict(size=8, color='blue')
     ))
 
-    # Update layout
     fig.update_layout(
         title="Segmentation Accuracy for Different Methods",
         xaxis_title="Methods",
@@ -65,8 +62,7 @@ def plot_results(results):
         height=400,
         width=1000
     )
-    
-    # Save the plot as an image
+
     if not os.path.exists('Image'):
         os.makedirs('Image')
     fig.write_image("Image/accuracy_plot.png")

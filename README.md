@@ -1,5 +1,11 @@
 # Image Segmentation Using Clustering
 
+Flooded zone image segmentation plays a key role in rapid disaster management function, thereby allowing efficient identification of the flooded zones. This is highly critical for timely response, resource allocation, and infrastructure planning to mitigate the dangers of loss of life, destruction of property, and disruption of essential services. There is a major scope for the use of advanced algorithms to minimize the impacts of flooding, ultimately saving lives and protecting communities from future disasters.
+
+
+### Requied packages are mentioned in requirements.txt file
+
+
 ## Project Setup and Workflow
 
 ### 1. Clone the Repository
