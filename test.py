@@ -7,7 +7,7 @@ import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 
 # Load images function
-def load_images(image_dir, num_images=10):
+def load_images(image_dir, num_images=5):
     images = []
     for i, filename in enumerate(os.listdir(image_dir)):
         if i >= num_images:
@@ -206,8 +206,6 @@ def main():
         print(f"Finished processing {method}")
 
     plot_results(results)
-
-    print(results)
 
 if __name__ == "__main__":
     main()
