@@ -114,7 +114,7 @@ def plot_results(results):
     for method, accuracies in kmeans_methods.items():
         mean_accuracy = np.mean(accuracies)
         fig.add_trace(
-            go.Bar(name=method, x=['Accuracy'], y=[mean_accuracy], marker_color=get_color(method)),
+            go.Bar(name=method, x=[method], y=[mean_accuracy], marker_color=get_color(method)),
             row=1, col=1
         )
     
@@ -122,39 +122,33 @@ def plot_results(results):
     for method, accuracies in meanshift_methods.items():
         mean_accuracy = np.mean(accuracies)
         fig.add_trace(
-            go.Bar(name=method, x=['Accuracy'], y=[mean_accuracy], marker_color=get_color(method)),
+            go.Bar(name=method, x=[method], y=[mean_accuracy], marker_color=get_color(method)),
             row=1, col=2
         )
 
-    # Update layout and add legend
+    # Update layout to add a single legend
     fig.update_layout(
         title="Segmentation Accuracy Comparison for KMeans and MeanShift Methods",
-        xaxis_title="Metrics",
         yaxis_title="Accuracy Score",
         height=500,
         width=1000,
         legend=dict(
             title="Dimensionality Reduction",
-            itemsizing='constant',
             orientation="h",
             x=0.5,
             y=-0.15,
             xanchor='center'
-        )
+        ),
+        showlegend=True
     )
-    
-    # Add legend entries for dimensionality reduction types
-    for reduction, color in color_map.items():
-        fig.add_trace(
-            go.Bar(name=reduction, x=[None], y=[None], marker_color=color, showlegend=True)
-        )
 
     # Save the plot as a single image
     if not os.path.exists('Image'):
         os.makedirs('Image')
     fig.write_image("Image/metrics_histogram_comparison_accuracy.png")
     
-    print("Histogram saved as Image/metrics_histogram_comparison.png")
+    print("Histogram saved as Image/metrics_histogram_comparison_accuracy.png")
+
 
 
 def main():
